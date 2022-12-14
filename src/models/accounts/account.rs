@@ -1,4 +1,7 @@
 use crate::models::money::Currency;
+use juniper::{GraphQLEnum, GraphQLObject};
+
+#[derive(GraphQLEnum)]
 pub enum AccountType {
     Vault,
     Credit,
@@ -6,6 +9,7 @@ pub enum AccountType {
     Promise,
 }
 
+#[derive(GraphQLObject)]
 pub struct Account {
     pub kind: AccountType,
     pub name: String,
