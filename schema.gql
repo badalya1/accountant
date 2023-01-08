@@ -1,0 +1,41 @@
+type Mutation {
+  empty: String!
+}
+
+type Currency {
+  id: ID!
+  name: String!
+  code: String!
+  symbol: String
+  numericCode: Int!
+  digits: Int!
+}
+
+enum AccountType {
+  VAULT
+  CREDIT
+  LOAN
+  PROMISE
+}
+
+type Subscription {
+  empty: String!
+}
+
+type Query {
+  accounts: [Account!]!
+}
+
+type Account {
+  id: ID!
+  name: String!
+  kind: AccountType!
+  currency: Currency!
+}
+
+schema {
+  query: Query
+  mutation: Mutation
+  subscription: Subscription
+}
+

@@ -1,10 +1,11 @@
-#[macro_use]
-extern crate juniper;
+#![allow(unused)]
 
+extern crate juniper;
+mod db;
 mod graphql;
 mod models;
 
-#[tokio::main]
-async fn main() {
-    println!("{:?} has been created", "David");
+fn main() {
+    // println!("{}", graphql::get_schema());
+    db::main();
 }

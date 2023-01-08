@@ -1,10 +1,10 @@
 use std::fmt;
-use std::ops::Add;
 
-use juniper::GraphQLObject;
+use juniper::{GraphQLObject, ID};
 
 #[derive(GraphQLObject, Debug, PartialEq, Clone)]
 pub struct Currency {
+    pub id: ID,
     pub name: String,
     pub code: String,
     pub symbol: Option<String>,
@@ -20,6 +20,7 @@ pub struct Money {
 
 #[derive(GraphQLObject, Debug)]
 pub struct ExchangeRate {
+    pub id: ID,
     pub from: Currency,
     pub to: Currency,
     pub rate: f64,
@@ -42,33 +43,5 @@ impl fmt::Display for Money {
                 Some(x) => x.to_string(),
             }
         )
-    }
-}
-
-impl Add for Money {
-    type Output = Result<Self, CurrencyMismatchError>;
-
-    fn add(self, other: Self) -> Self::Output {
-        if self.currency == other.currency {
-            Ok(Self {
-                amount: self.amount + other.amount,
-                currency: self.currency,
-            })
-        } else {
-            Err(CurrencyMismatchError {
-                message: format!("Can't add {self} and {other}"),
-            })
-        }
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct CurrencyMismatchError {
-    message: String,
-}
-
-impl fmt::Display for CurrencyMismatchError {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "Currency Mismatch: {}", self.message)
     }
 }
