@@ -1,48 +1,56 @@
+use super::m20230113_143331_create_currency_table::Currency;
 use sea_orm_migration::prelude::*;
-
 #[derive(DeriveMigrationName)]
 pub struct Migration;
 
 #[async_trait::async_trait]
 impl MigrationTrait for Migration {
     async fn up(&self, manager: &SchemaManager) -> Result<(), DbErr> {
-        // Replace the sample below with your own migration scripts
-        todo!();
-
         manager
             .create_table(
                 Table::create()
-                    .table(Post::Table)
+                    .table(ExchangeRate::Table)
                     .if_not_exists()
                     .col(
-                        ColumnDef::new(Post::Id)
+                        ColumnDef::new(ExchangeRate::Id)
                             .integer()
                             .not_null()
                             .auto_increment()
                             .primary_key(),
                     )
-                    .col(ColumnDef::new(Post::Title).string().not_null())
-                    .col(ColumnDef::new(Post::Text).string().not_null())
+                    .col(ColumnDef::new(ExchangeRate::FromId).integer().not_null())
+                    .col(ColumnDef::new(ExchangeRate::ToId).integer().not_null())
+                    .col(ColumnDef::new(ExchangeRate::Rate).double().not_null())
+                    .foreign_key(
+                        ForeignKey::create()
+                            .name("ExchangeRate_fromId_fkey")
+                            .from(ExchangeRate::Table, ExchangeRate::FromId)
+                            .to(Currency::Table, Currency::Id),
+                    )
+                    .foreign_key(
+                        ForeignKey::create()
+                            .name("ExchangeRate_toId_fkey")
+                            .from(ExchangeRate::Table, ExchangeRate::ToId)
+                            .to(Currency::Table, Currency::Id),
+                    )
                     .to_owned(),
             )
             .await
     }
 
     async fn down(&self, manager: &SchemaManager) -> Result<(), DbErr> {
-        // Replace the sample below with your own migration scripts
-        todo!();
-
         manager
-            .drop_table(Table::drop().table(Post::Table).to_owned())
+            .drop_table(Table::drop().table(ExchangeRate::Table).to_owned())
             .await
     }
 }
 
 /// Learn more at https://docs.rs/sea-query#iden
 #[derive(Iden)]
-enum Post {
+enum ExchangeRate {
     Table,
     Id,
-    Title,
-    Text,
+    FromId,
+    ToId,
+    Rate,
 }
