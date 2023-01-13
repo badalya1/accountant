@@ -1,6 +1,5 @@
 pub use sea_orm_migration::prelude::*;
 
-mod m20230113_143230_init;
 mod m20230113_143331_create_currency_table;
 mod m20230113_143340_create_account_table;
 mod m20230113_143352_create_forex_table;
@@ -13,7 +12,6 @@ pub struct Migrator;
 impl MigratorTrait for Migrator {
     fn migrations() -> Vec<Box<dyn MigrationTrait>> {
         vec![
-            Box::new(m20230113_143230_init::Migration),
             Box::new(m20230113_143331_create_currency_table::Migration),
             Box::new(m20230113_143340_create_account_table::Migration),
             Box::new(m20230113_143352_create_forex_table::Migration),
