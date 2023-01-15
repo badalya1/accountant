@@ -1,11 +1,6 @@
 #![allow(unused)]
-
-extern crate juniper;
-mod db;
-mod graphql;
-mod models;
+// TODO: Run the main function of api here so playground can be accessed
 
 fn main() {
-    // println!("{}", graphql::get_schema());
-    db::main();
+    accountant_graphql_api::main();
 }
