@@ -9,6 +9,5 @@ name = "entity"
 path = "src/lib.rs"
 
 [dependencies]
-async-graphql = "5.0.5"
 sea-orm = "0.10.6"
 serde = { version = "1.0.152", features = ["derive"] }
