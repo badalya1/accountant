@@ -2,56 +2,42 @@ mod db;
 mod graphql;
 mod types;
 
-use actix_cors::Cors;
-use actix_web::{
-    http::header,
-    middleware,
-    web::{self, Data},
-    App, Error, HttpResponse, HttpServer,
-};
-use juniper_actix::{graphiql_handler, graphql_handler, playground_handler};
+use std::env;
 
-use graphql::schema::{build_schema, Schema};
-use graphql::Context;
+use warp::{http::Response, Filter};
 
-async fn graphiql_route() -> Result<HttpResponse, Error> {
-    graphiql_handler("/graphql", None).await
-}
-async fn playground_route() -> Result<HttpResponse, Error> {
-    playground_handler("/graphql", None).await
-}
-async fn graphql_route(
-    req: actix_web::HttpRequest,
-    payload: actix_web::web::Payload,
-    schema: web::Data<Schema>,
-) -> Result<HttpResponse, Error> {
-    let context = Context::new();
-    graphql_handler(&schema, &context, req, payload).await
-}
+use db::Database;
 
-#[actix_web::main]
-async fn main() -> std::io::Result<()> {
-    let server = HttpServer::new(move || {
-        App::new()
-            .app_data(Data::new(build_schema()))
-            .wrap(
-                Cors::default()
-                    .allow_any_origin()
-                    .allowed_methods(vec!["POST", "GET"])
-                    .allowed_headers(vec![header::AUTHORIZATION, header::ACCEPT])
-                    .allowed_header(header::CONTENT_TYPE)
-                    .supports_credentials()
-                    .max_age(3600),
-            )
-            .wrap(middleware::Compress::default())
-            .wrap(middleware::Logger::default())
-            .service(
-                web::resource("/graphql")
-                    .route(web::post().to(graphql_route))
-                    .route(web::get().to(graphql_route)),
-            )
-            .service(web::resource("/playground").route(web::get().to(playground_route)))
-            .service(web::resource("/graphiql").route(web::get().to(graphiql_route)))
+use graphql::schema::build_schema;
+
+#[tokio::main]
+pub async fn serve() {
+    env::set_var("RUST_LOG", "warp_server");
+    env_logger::init();
+
+    let log = warp::log("warp_server");
+
+    let homepage = warp::path::end().map(|| {
+        Response::builder()
+            .header("content-type", "text/html")
+            .body(format!(
+                "<html><h1>juniper_warp</h1><div>visit <a href=\"/graphiql\">/graphiql</a></html>"
+            ))
     });
-    server.bind("127.0.0.1:8080").unwrap().run().await
+
+    log::info!("Listening on 127.0.0.1:8080");
+    let database = Database::new().await;
+    let state = warp::any().map(move || database.clone());
+    let graphql_filter = juniper_warp::make_graphql_filter(build_schema(), state.boxed());
+
+    warp::serve(
+        warp::get()
+            .and(warp::path("graphiql"))
+            .and(juniper_warp::graphiql_filter("/graphql", None))
+            .or(homepage)
+            .or(warp::path("graphql").and(graphql_filter))
+            .with(log),
+    )
+    .run(([127, 0, 0, 1], 8080))
+    .await
 }

@@ -1,10 +1,27 @@
-use entity::async_graphql;
+use crate::{db::Database, types::Account};
+use accountant_core;
+use juniper::{graphql_object, FieldResult};
 
-pub mod account;
+pub struct Query;
 
-pub use account::AccountQuery;
+#[graphql_object(context = Database)]
+impl Query {
+    fn api_version() -> &'static str {
+        "1.0"
+    }
 
-// Add your other ones here to create a unified Query object
-// e.x. Query(NoteQuery, OtherQuery, OtherOtherQuery)
-#[derive(async_graphql::MergedObject, Default)]
-pub struct Query(AccountQuery);
+    async fn get_accounts(&self, context: &Database) -> FieldResult<Vec<Account>> {
+        let conn = context.get_connection();
+        let mut result: Vec<Account> = Vec::new();
+        let accounts = accountant_core::Query::get_all_accounts(conn)
+            .await
+            .map_err(|e| e.to_string())
+            .unwrap();
+
+        for a in accounts {
+            result.push(Account::from(a))
+        }
+
+        Ok(result)
+    }
+}
