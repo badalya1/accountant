@@ -1,44 +1,57 @@
 mod db;
 mod graphql;
+mod types;
 
-use entity::async_graphql;
-
-use async_graphql::http::{playground_source, GraphQLPlaygroundConfig};
-use async_graphql_axum::{GraphQLRequest, GraphQLResponse};
-use axum::{
-    extract::Extension,
-    response::{Html, IntoResponse},
-    routing::get,
-    Router,
+use actix_cors::Cors;
+use actix_web::{
+    http::header,
+    middleware,
+    web::{self, Data},
+    App, Error, HttpResponse, HttpServer,
 };
-use graphql::schema::{build_schema, AppSchema};
+use juniper_actix::{graphiql_handler, graphql_handler, playground_handler};
 
-#[cfg(debug_assertions)]
-use dotenvy::dotenv;
+use graphql::schema::{build_schema, Schema};
+use graphql::Context;
 
-async fn graphql_handler(schema: Extension<AppSchema>, req: GraphQLRequest) -> GraphQLResponse {
-    schema.execute(req.into_inner()).await.into()
+async fn graphiql_route() -> Result<HttpResponse, Error> {
+    graphiql_handler("/graphql", None).await
+}
+async fn playground_route() -> Result<HttpResponse, Error> {
+    playground_handler("/graphql", None).await
+}
+async fn graphql_route(
+    req: actix_web::HttpRequest,
+    payload: actix_web::web::Payload,
+    schema: web::Data<Schema>,
+) -> Result<HttpResponse, Error> {
+    let context = Context::new();
+    graphql_handler(&schema, &context, req, payload).await
 }
 
-async fn graphql_playground() -> impl IntoResponse {
-    Html(playground_source(GraphQLPlaygroundConfig::new("/graphql")))
-}
-
-#[tokio::main]
-pub async fn main() {
-    #[cfg(debug_assertions)]
-    dotenv().ok();
-
-    let schema = build_schema().await;
-
-    let app = Router::new()
-        .route("/graphql", get(graphql_playground).post(graphql_handler))
-        .layer(Extension(schema));
-
-    println!("Playground: http://localhost:3000/graphql");
-
-    axum::Server::bind(&"0.0.0.0:3000".parse().unwrap())
-        .serve(app.into_make_service())
-        .await
-        .unwrap();
+#[actix_web::main]
+async fn main() -> std::io::Result<()> {
+    let server = HttpServer::new(move || {
+        App::new()
+            .app_data(Data::new(build_schema()))
+            .wrap(
+                Cors::default()
+                    .allow_any_origin()
+                    .allowed_methods(vec!["POST", "GET"])
+                    .allowed_headers(vec![header::AUTHORIZATION, header::ACCEPT])
+                    .allowed_header(header::CONTENT_TYPE)
+                    .supports_credentials()
+                    .max_age(3600),
+            )
+            .wrap(middleware::Compress::default())
+            .wrap(middleware::Logger::default())
+            .service(
+                web::resource("/graphql")
+                    .route(web::post().to(graphql_route))
+                    .route(web::get().to(graphql_route)),
+            )
+            .service(web::resource("/playground").route(web::get().to(playground_route)))
+            .service(web::resource("/graphiql").route(web::get().to(graphiql_route)))
+    });
+    server.bind("127.0.0.1:8080").unwrap().run().await
 }
