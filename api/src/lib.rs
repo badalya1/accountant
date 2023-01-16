@@ -1,5 +1,5 @@
 mod db;
-mod graphql;
+pub mod graphql;
 mod types;
 
 use std::env;
@@ -7,8 +7,9 @@ use std::env;
 use warp::{http::Response, Filter};
 
 use db::Database;
+pub use graphql::schema::build_schema;
 
-use graphql::schema::build_schema;
+pub use graphql::schema::Schema;
 
 #[tokio::main]
 pub async fn serve() {
