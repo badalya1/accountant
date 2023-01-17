@@ -14,4 +14,5 @@ members = [".", "api", "core", "entity", "migration"]
 [dependencies]
 accountant-graphql-api = { path = "api" }
 accountant-core = { path = "core" }
+migration = { path = "migration" }
 dotenvy = "0.15.6"

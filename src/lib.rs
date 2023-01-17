@@ -1,6 +1,7 @@
 // TODO: Export rootnode of graphql api here so general journal can use it
 pub use accountant_graphql_api as api;
 use accountant_graphql_api::{build_schema, Schema};
+pub use migration;
 #[no_mangle]
 pub fn get_root_node() -> Schema {
     build_schema()
