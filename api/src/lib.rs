@@ -1,6 +1,6 @@
-mod db;
+pub mod db;
 pub mod graphql;
-mod types;
+pub mod types;
 
 use std::env;
 
