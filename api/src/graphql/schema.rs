@@ -1,5 +1,4 @@
 use juniper::{EmptyMutation, EmptySubscription};
-use migration::{Migrator, MigratorTrait};
 
 use crate::{db::Database, graphql::query::Query};
 
