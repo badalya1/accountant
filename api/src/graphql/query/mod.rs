@@ -1,4 +1,7 @@
-use crate::{db::Database, types::Account};
+use crate::{
+    db::Database,
+    types::{Account, ConvertableVec},
+};
 use accountant_core;
 use juniper::{graphql_object, FieldResult};
 
@@ -12,16 +15,11 @@ impl Query {
 
     async fn get_accounts(&self, context: &Database) -> FieldResult<Vec<Account>> {
         let conn = context.get_connection();
-        let mut result: Vec<Account> = Vec::new();
         let accounts = accountant_core::Query::get_all_accounts(conn)
             .await
             .map_err(|e| e.to_string())
             .unwrap();
-
-        for a in accounts {
-            result.push(Account::from(a))
-        }
-
+        let result: Vec<Account> = accounts.convert();
         Ok(result)
     }
 }
