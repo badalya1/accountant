@@ -1,16 +1,14 @@
-use juniper::{EmptyMutation, EmptySubscription};
+use juniper::EmptySubscription;
 
-use crate::{db::Database, graphql::query::Query};
+use crate::db::Database;
 
-pub type Schema =
-    juniper::RootNode<'static, Query, EmptyMutation<Database>, EmptySubscription<Database>>;
+use super::mutation::Mutation;
+use super::query::Query;
+
+pub type Schema = juniper::RootNode<'static, Query, Mutation, EmptySubscription<Database>>;
 
 pub fn build_schema() -> Schema {
-    Schema::new(
-        Query,
-        EmptyMutation::<Database>::new(),
-        EmptySubscription::<Database>::new(),
-    )
+    Schema::new(Query, Mutation, EmptySubscription::<Database>::new())
 }
 
 // /// Builds the GraphQL Schema, attaching the Database to the context
