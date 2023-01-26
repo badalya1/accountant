@@ -10,14 +10,3 @@ pub type Schema = juniper::RootNode<'static, Query, Mutation, EmptySubscription<
 pub fn build_schema() -> Schema {
     Schema::new(Query, Mutation, EmptySubscription::<Database>::new())
 }
-
-// /// Builds the GraphQL Schema, attaching the Database to the context
-// pub async fn build_schema() -> AppSchema {
-//     let db = Database::new().await;
-
-//     Migrator::up(db.get_connection(), None).await.unwrap();
-
-//     Schema::build(Query::default(), EmptyMutation, EmptySubscription)
-//         .data(db)
-//         .finish()
-// }
