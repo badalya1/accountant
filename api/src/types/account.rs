@@ -2,9 +2,9 @@ use super::currency::*;
 use crate::db::Database;
 use cuid::cuid2 as cuid;
 use entity::account;
-use juniper::{graphql_object, FieldResult, GraphQLEnum, GraphQLInputObject, GraphQLObject, ID};
+use juniper::{graphql_object, FieldResult, GraphQLEnum, GraphQLInputObject, ID};
 use std::str::FromStr;
-use strum_macros::{EnumProperty, EnumString};
+use strum_macros::EnumString;
 #[derive(GraphQLEnum, EnumString, Debug)]
 pub enum AccountType {
     Vault,
