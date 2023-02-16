@@ -11,6 +11,7 @@ pub struct Model {
     pub from_id: i32,
     pub to_id: i32,
     pub rate: f64,
+    pub updated_at: String,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]

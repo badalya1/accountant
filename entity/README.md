@@ -3,11 +3,12 @@
 To generate entities from migrations:
 
 1. Run the migrations
-    ```
-    accountant> sea-orm-cli migration up
-    ```
+
+   ```
+   accountant> sea-orm-cli migrate up
+   ```
 
 2. Generate entities
-    ```
-    accountant> sea-orm-cli generate entity -o ./entity/src/entities -v --with-serde both
-    ```
+   ```
+   accountant> sea-orm-cli generate entity -o ./entity/src/entities -v --with-serde both
+   ```

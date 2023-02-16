@@ -34,6 +34,7 @@ impl Currency {
     fn digits(&self) -> &i32 {
         &self.model.digits
     }
+    fn selected(&self) -> &bool {
+        &self.model.selected
+    }
 }
-
-// impl ConvertableVec<account::Model, Account> for Vec<account::Model> {}

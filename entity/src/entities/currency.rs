@@ -11,8 +11,10 @@ pub struct Model {
     pub name: String,
     pub code: String,
     pub symbol: Option<String>,
+    pub symbol_native: Option<String>,
     pub numeric_code: i32,
     pub digits: i32,
+    pub selected: bool,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
