@@ -21,12 +21,19 @@ impl MigrationTrait for Migration {
                     .col(ColumnDef::new(Currency::Name).string().not_null())
                     .col(ColumnDef::new(Currency::Code).string().not_null())
                     .col(ColumnDef::new(Currency::Symbol).string())
+                    .col(ColumnDef::new(Currency::SymbolNative).string())
                     .col(ColumnDef::new(Currency::NumericCode).integer().not_null())
                     .col(
                         ColumnDef::new(Currency::Digits)
                             .integer()
                             .not_null()
                             .default(2),
+                    )
+                    .col(
+                        ColumnDef::new(Currency::Selected)
+                            .boolean()
+                            .not_null()
+                            .default(false),
                     )
                     .to_owned(),
             )
@@ -47,6 +54,8 @@ pub enum Currency {
     Name,
     Code,
     Symbol,
+    SymbolNative,
     NumericCode,
     Digits,
+    Selected,
 }

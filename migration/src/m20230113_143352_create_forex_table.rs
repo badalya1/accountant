@@ -21,6 +21,12 @@ impl MigrationTrait for Migration {
                     .col(ColumnDef::new(ExchangeRate::FromId).integer().not_null())
                     .col(ColumnDef::new(ExchangeRate::ToId).integer().not_null())
                     .col(ColumnDef::new(ExchangeRate::Rate).double().not_null())
+                    .col(
+                        ColumnDef::new(ExchangeRate::UpdatedAt)
+                            .date_time()
+                            .not_null()
+                            .extra("DEFAULT CURRENT_TIMESTAMP".to_owned()),
+                    )
                     .foreign_key(
                         ForeignKey::create()
                             .name("ExchangeRate_fromId_fkey")
@@ -53,4 +59,5 @@ enum ExchangeRate {
     FromId,
     ToId,
     Rate,
+    UpdatedAt,
 }
