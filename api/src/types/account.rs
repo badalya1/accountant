@@ -1,10 +1,12 @@
 use super::currency::*;
 use crate::db::Database;
+use accountant_core::currency;
 use cuid::cuid2 as cuid;
 use entity::account;
 use juniper::{graphql_object, FieldResult, GraphQLEnum, GraphQLInputObject, ID};
 use std::str::FromStr;
 use strum_macros::EnumString;
+
 #[derive(GraphQLEnum, EnumString, Debug)]
 pub enum AccountType {
     Vault,
@@ -65,7 +67,7 @@ impl Account {
     async fn currency(&self, context: &Database) -> FieldResult<Currency> {
         let conn = context.get_connection();
         let currency: Currency =
-            accountant_core::Query::find_currency_by_id(conn, self.model.currency_id)
+            currency::CurrencyQuery::find_currency_by_id(conn, self.model.currency_id)
                 .await
                 .map_err(|e| e.to_string())
                 .unwrap()

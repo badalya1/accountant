@@ -3,6 +3,7 @@ use crate::db::Database;
 use juniper::graphql_object;
 
 use super::account::AccountMutation;
+use super::currency::CurrencyMutation;
 
 pub struct Mutation;
 
@@ -10,5 +11,9 @@ pub struct Mutation;
 impl Mutation {
     fn accounts(&self) -> AccountMutation {
         AccountMutation
+    }
+
+    fn currencies(&self) -> CurrencyMutation {
+        CurrencyMutation
     }
 }
