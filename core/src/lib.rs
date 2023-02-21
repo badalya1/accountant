@@ -1,9 +1,4 @@
-mod mutation;
-mod query;
-mod subscription;
-
-pub use mutation::Mutation;
-pub use query::Query;
-pub use subscription::Subscription;
+pub mod account;
+pub mod currency;
 
 pub use sea_orm;
