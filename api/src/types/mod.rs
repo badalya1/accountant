@@ -3,8 +3,8 @@ mod currency;
 
 pub use account::*;
 pub use currency::*;
-use juniper::FieldResult;
-use std::{convert::From, fmt::Display};
+use juniper::{FieldResult, ID};
+use std::fmt::Display;
 
 pub trait ConvertableVec<V, U> {
     fn convert(self) -> Vec<U>
@@ -37,5 +37,17 @@ where
             Ok(value) => Ok(value.into()),
             Err(e) => Err(e.into()),
         }
+    }
+}
+
+pub struct IDi32(pub i32);
+
+impl From<ID> for IDi32 {
+    fn from(value: ID) -> Self {
+        IDi32(
+            value
+                .parse::<i32>()
+                .expect("Could not convert from ID to i32"),
+        )
     }
 }
