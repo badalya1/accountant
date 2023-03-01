@@ -1,4 +1,4 @@
-use super::currency::*;
+use super::{currency::*, IDi32};
 use crate::db::Database;
 use accountant_core::currency;
 use cuid::cuid2 as cuid;
@@ -18,7 +18,7 @@ pub enum AccountType {
 #[derive(GraphQLInputObject)]
 pub struct NewAccountInput {
     pub name: String,
-    pub currency_id: i32,
+    pub currency_id: ID,
     pub account_type: AccountType,
     pub icon: Option<String>,
 }
@@ -36,10 +36,11 @@ impl From<account::Model> for Account {
 
 impl From<NewAccountInput> for account::Model {
     fn from(value: NewAccountInput) -> Self {
+        let currency_id: IDi32 = value.currency_id.into();
         account::Model {
             id: cuid(),
             name: value.name,
-            currency_id: value.currency_id,
+            currency_id: currency_id.0,
             account_type: value.account_type.into(),
             icon: value.icon,
         }
