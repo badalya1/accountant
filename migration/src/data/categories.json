@@ -1,0 +1,187 @@
+[
+    {
+        "id": 2,
+        "name": "Salary",
+        "parent_id": null
+    },
+    {
+        "id": 3,
+        "name": "Business Income",
+        "parent_id": null
+    },
+    {
+        "id": 4,
+        "name": "Investment Income",
+        "parent_id": null
+    },
+    {
+        "id": 6,
+        "name": "Housing",
+        "parent_id": null
+    },
+    {
+        "id": 7,
+        "name": "Mortgage or Rent",
+        "parent_id": 6
+    },
+    {
+        "id": 8,
+        "name": "Utilities",
+        "parent_id": 6
+    },
+    {
+        "id": 9,
+        "name": "Repairs and Maintenance",
+        "parent_id": 6
+    },
+    {
+        "id": 10,
+        "name": "Insurance",
+        "parent_id": 6
+    },
+    {
+        "id": 11,
+        "name": "Property Taxes",
+        "parent_id": 6
+    },
+    {
+        "id": 12,
+        "name": "Transportation",
+        "parent_id": null
+    },
+    {
+        "id": 13,
+        "name": "Car Payment",
+        "parent_id": 12
+    },
+    {
+        "id": 14,
+        "name": "Gasoline",
+        "parent_id": 12
+    },
+    {
+        "id": 15,
+        "name": "Repairs and Maintenance",
+        "parent_id": 12
+    },
+    {
+        "id": 16,
+        "name": "Insurance",
+        "parent_id": 12
+    },
+    {
+        "id": 17,
+        "name": "Public Transportation",
+        "parent_id": 12
+    },
+    {
+        "id": 18,
+        "name": "Food",
+        "parent_id": null
+    },
+    {
+        "id": 19,
+        "name": "Groceries",
+        "parent_id": 18
+    },
+    {
+        "id": 20,
+        "name": "Dining Out",
+        "parent_id": 18
+    },
+    {
+        "id": 21,
+        "name": "Alcohol",
+        "parent_id": 18
+    },
+    {
+        "id": 22,
+        "name": "Personal",
+        "parent_id": null
+    },
+    {
+        "id": 23,
+        "name": "Clothing",
+        "parent_id": 22
+    },
+    {
+        "id": 24,
+        "name": "Toiletries and Cosmetics",
+        "parent_id": 22
+    },
+    {
+        "id": 25,
+        "name": "Medical and Healthcare",
+        "parent_id": 22
+    },
+    {
+        "id": 26,
+        "name": "Entertainment",
+        "parent_id": 22
+    },
+    {
+        "id": 27,
+        "name": "Debt Payments",
+        "parent_id": null
+    },
+    {
+        "id": 28,
+        "name": "Credit Card Payment",
+        "parent_id": 27
+    },
+    {
+        "id": 29,
+        "name": "Loan Payment",
+        "parent_id": 27
+    },
+    {
+        "id": 30,
+        "name": "Investments",
+        "parent_id": null
+    },
+    {
+        "id": 31,
+        "name": "Retirement Savings",
+        "parent_id": 30
+    },
+    {
+        "id": 32,
+        "name": "Other Investments",
+        "parent_id": 30
+    },
+    {
+        "id": 33,
+        "name": "Education",
+        "parent_id": null
+    },
+    {
+        "id": 34,
+        "name": "Tuition and Fees",
+        "parent_id": 33
+    },
+    {
+        "id": 35,
+        "name": "Books and Supplies",
+        "parent_id": 33
+    },
+    {
+        "id": 36,
+        "name": "Childcare and Education",
+        "parent_id": null
+    },
+    {
+        "id": 37,
+        "name": "Childcare",
+        "parent_id": 36
+    },
+    {
+        "id": 38,
+        "name": "School Tuition and Fees",
+        "parent_id": 36
+    },
+    {
+        "id": 39,
+        "name": "Charitable Donations",
+        "parent_id": null
+    }
+]
