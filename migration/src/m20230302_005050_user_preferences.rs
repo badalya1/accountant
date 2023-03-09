@@ -24,8 +24,8 @@ impl MigrationTrait for Migration {
                             .not_null()
                             .unique_key(),
                     )
-                    .col(ColumnDef::new(Preference::Value).string().not_null())
-                    .col(ColumnDef::new(Preference::DefaultValue).string())
+                    .col(ColumnDef::new(Preference::Value).json_binary().not_null())
+                    .col(ColumnDef::new(Preference::DefaultValue).json_binary())
                     .to_owned(),
             )
             .await
