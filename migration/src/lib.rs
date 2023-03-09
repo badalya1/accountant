@@ -9,6 +9,8 @@ mod m20230113_143410_create_transaction_table;
 mod m20230113_143431_create_transfer_table;
 mod m20230216_143556_populate_currencies;
 mod m20230302_005050_user_preferences;
+mod m20230309_180039_transaction_categories;
+mod m20230309_180051_populate_categories;
 
 pub struct Migrator;
 
@@ -23,6 +25,8 @@ impl MigratorTrait for Migrator {
             Box::new(m20230113_143431_create_transfer_table::Migration),
             Box::new(m20230216_143556_populate_currencies::Migration),
             Box::new(m20230302_005050_user_preferences::Migration),
+            Box::new(m20230309_180039_transaction_categories::Migration),
+            Box::new(m20230309_180051_populate_categories::Migration),
         ]
     }
 }
