@@ -1,4 +1,5 @@
 mod account;
+mod category;
 mod currency;
 
 pub mod mutation;
