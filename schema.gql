@@ -1,5 +1,14 @@
+type AccountMutation {
+  create(data: NewAccountInput!): Account!
+}
+
+type AccountQuery {
+  list: [Account!]!
+}
+
 type Mutation {
-  empty: String!
+  accounts: AccountMutation!
+  currencies: CurrencyMutation!
 }
 
 type Currency {
@@ -9,6 +18,11 @@ type Currency {
   symbol: String
   numericCode: Int!
   digits: Int!
+  selected: Boolean!
+}
+
+type CurrencyMutation {
+  setSelected(currencyId: ID!, value: Boolean!): Currency!
 }
 
 enum AccountType {
@@ -18,12 +32,17 @@ enum AccountType {
   PROMISE
 }
 
-type Subscription {
-  empty: String!
+input NewAccountInput {
+  name: String!
+  currencyId: ID!
+  accountType: AccountType!
+  icon: String
 }
 
 type Query {
-  accounts: [Account!]!
+  apiVersion: String!
+  accounts: AccountQuery!
+  currencies: CurrencyQuery!
 }
 
 type Account {
@@ -33,9 +52,12 @@ type Account {
   currency: Currency!
 }
 
+type CurrencyQuery {
+  list: [Currency!]!
+}
+
 schema {
   query: Query
   mutation: Mutation
-  subscription: Subscription
 }
 
