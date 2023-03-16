@@ -13,4 +13,9 @@ impl CurrencyQuery {
     ) -> Result<Option<currency::Model>, DbErr> {
         Currency::find_by_id(id).one(db).await
     }
+
+    // pub async fn get_main_currency(db: &DbConn) -> Result<currency::Model, DbErr> {
+    //     let main_currency_id = Preference::find_by_id()
+    //     Currency::find_by_id(id).one(db).await
+    // }
 }

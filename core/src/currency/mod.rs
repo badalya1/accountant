@@ -1,3 +1,4 @@
+mod calculator;
 mod mutation;
 mod query;
 
