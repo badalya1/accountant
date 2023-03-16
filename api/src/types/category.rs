@@ -1,11 +1,13 @@
-use entity::category;
-use juniper::{graphql_object, GraphQLInputObject, ID};
+use accountant_core::category;
+use entity::category::*;
 
-use crate::db::Database;
+use juniper::{graphql_object, FieldResult, GraphQLInputObject, ID};
+
+use crate::{db::Database, types::ConvertableVec};
 
 #[derive(Debug, Clone)]
 pub struct Category {
-    model: category::Model,
+    model: Model,
 }
 
 #[derive(GraphQLInputObject)]
@@ -15,8 +17,8 @@ pub struct UpdateCategoryInput {
     pub description: Option<String>,
 }
 
-impl From<category::Model> for Category {
-    fn from(value: category::Model) -> Self {
+impl From<Model> for Category {
+    fn from(value: Model) -> Self {
         Category { model: value }
     }
 }
@@ -28,5 +30,12 @@ impl Category {
     }
     fn name(&self) -> &str {
         &self.model.name
+    }
+    async fn children(&self, context: &Database) -> FieldResult<Vec<Category>> {
+        let conn = context.get_connection();
+
+        let categories = category::CategoryQuery::get_children(conn, self.model.id).await?;
+
+        Ok(categories.convert())
     }
 }

@@ -12,15 +12,10 @@ impl CategoryMutation {
         new_category.insert(db).await
     }
     pub async fn update(
-        db: &DbConn,
-        category_id: i32,
-        category: category::Model,
+        _db: &DbConn,
+        _category_id: i32,
+        _category: category::Model,
     ) -> Result<category::Model, DbErr> {
-        // let new_category = category::ActiveModel::from(category) ;
-        let updated = category::Entity::find_by_id(category_id)
-            .one(db)
-            .await?
-            .unwrap();
-        return Ok(updated);
+        todo!();
     }
 }

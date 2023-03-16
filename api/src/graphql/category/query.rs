@@ -10,7 +10,7 @@ pub struct CategoryQuery;
 impl CategoryQuery {
     async fn list(context: &Database) -> FieldResult<Vec<Category>> {
         let conn = context.get_connection();
-        let categories = category::CategoryQuery::list(conn)
+        let categories = category::CategoryQuery::list_roots(conn)
             .await
             .map_err(|e| e.to_string())
             .unwrap();
