@@ -1,4 +1,4 @@
-pub mod db;
+pub mod context;
 pub mod graphql;
 pub mod types;
 
@@ -6,7 +6,7 @@ use std::env;
 
 use warp::{http::Response, Filter};
 
-use db::Database;
+use context::Context;
 pub use graphql::schema::build_schema;
 
 pub use graphql::schema::Schema;
@@ -27,7 +27,7 @@ pub async fn serve() {
     });
 
     log::info!("Listening on 127.0.0.1:8080");
-    let database = Database::new().await;
+    let database = Context::new().await;
     let state = warp::any().map(move || database.clone());
     let graphql_filter = juniper_warp::make_graphql_filter(build_schema(), state.boxed());
 
