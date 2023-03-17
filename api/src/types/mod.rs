@@ -1,10 +1,13 @@
 mod account;
 mod category;
 mod currency;
+mod exchange_rate;
 
 pub use account::*;
 pub use category::*;
 pub use currency::*;
+pub use exchange_rate::*;
+
 use juniper::{FieldResult, ID};
 use std::fmt::Display;
 

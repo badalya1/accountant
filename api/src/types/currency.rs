@@ -1,7 +1,7 @@
 use entity::currency;
 use juniper::{graphql_object, ID};
 
-use crate::db::Database;
+use crate::context::Context;
 
 #[derive(Debug, Clone)]
 pub struct Currency {
@@ -14,7 +14,7 @@ impl From<currency::Model> for Currency {
     }
 }
 
-#[graphql_object(context = Database)]
+#[graphql_object(context = Context)]
 impl Currency {
     fn id(&self) -> ID {
         ID::from(self.model.id.to_string())
@@ -36,5 +36,9 @@ impl Currency {
     }
     fn selected(&self) -> &bool {
         &self.model.selected
+    }
+    fn rate($self, context: &Context) -> FieldResult<CalculatedRate> {
+        todo!()
+
     }
 }
