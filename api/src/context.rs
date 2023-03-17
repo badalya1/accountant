@@ -1,12 +1,13 @@
-use accountant_core::sea_orm::DatabaseConnection;
+use accountant_core::{currency::RateCalculator, sea_orm::DatabaseConnection};
 use juniper::Context as JuniperContext;
 
 #[derive(Clone)]
-pub struct Database {
+pub struct Context {
     pub connection: DatabaseConnection,
+    pub forex: RateCalculator,
 }
 
-impl Database {
+impl Context {
     pub async fn new() -> Self {
         let connection = accountant_core::sea_orm::Database::connect(
             std::env::var("DATABASE_URL").expect("DATABASE_URL not provided"),
@@ -14,7 +15,9 @@ impl Database {
         .await
         .expect("Could not connect to database");
 
-        Database { connection }
+        let forex = RateCalculator::new(connection.clone(), 1).await;
+
+        Context { connection, forex }
     }
 
     pub fn get_connection(&self) -> &DatabaseConnection {
@@ -22,4 +25,4 @@ impl Database {
     }
 }
 
-impl JuniperContext for Database {}
+impl JuniperContext for Context {}
