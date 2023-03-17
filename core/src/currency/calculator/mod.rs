@@ -1,211 +1,137 @@
+use entity::currency::Model as Currency;
+use entity::exchange_rate::Model as Rate;
+use sea_orm::DbConn;
 use std::collections::{HashMap, HashSet, VecDeque};
+
+use crate::exchange_rate::ExchangeRateQuery;
 
 type CurrencyId = i32;
 type RateId = i32;
 
-struct Currency {
-    id: CurrencyId,
-    code: String,
-}
-
-struct Rate {
-    id: RateId,
-    from: CurrencyId,
-    to: CurrencyId,
-    rate: f64,
+#[derive(Debug, Clone, Copy)]
+pub struct ConversionNode {
+    pub currency_id: CurrencyId,
+    pub rate_id: Option<RateId>,
+    pub inverted: bool,
 }
 
 #[derive(Debug, Clone)]
-struct ConversionEdge {
-    rate_id: RateId,
-    inverted: bool,
+pub struct CalculatedRate {
+    pub to: CurrencyId,
+    pub rate: f64,
+    pub path: Vec<ConversionNode>,
 }
+#[derive(Clone)]
+pub struct RateCalculator {
+    db: DbConn,
+    main_currency_id: CurrencyId,
 
-struct RateCalculator {
-    currencies: HashMap<CurrencyId, Currency>,
     rates: HashMap<RateId, Rate>,
+    nodes: HashMap<CurrencyId, ConversionNode>,
 }
-
-// fn test() {
-// }
-// type CurrencyId = i32;
 
 impl RateCalculator {
-    fn new() -> Self {
-        let mut currencies = HashMap::new();
-        let mut rates = HashMap::new();
-        let test_currs = [
-            Currency {
-                id: 0,
-                code: "USD".to_string(),
-            },
-            Currency {
-                id: 1,
-                code: "CAD".to_string(),
-            },
-            Currency {
-                id: 2,
-                code: "EUR".to_string(),
-            },
-            Currency {
-                id: 3,
-                code: "AMD".to_string(),
-            },
-        ];
+    pub async fn new(db: DbConn, main_currency_id: CurrencyId) -> Self {
+        let mut new_calculator = Self {
+            db,
+            main_currency_id,
+            rates: HashMap::new(),
+            nodes: HashMap::new(),
+        };
 
-        let test_rates = [
-            Rate {
-                id: 0,
-                from: 0,
-                to: 1,
-                rate: 1.3721699,
-            },
-            Rate {
-                id: 1,
-                from: 1,
-                to: 2,
-                rate: 0.68632711,
-            },
-            Rate {
-                id: 2,
-                from: 3,
-                to: 1,
-                rate: 0.0035544465,
-            },
-        ];
-
-        for curr in test_currs.into_iter() {
-            currencies.insert(curr.id, curr);
-        }
-
-        for rate in test_rates.into_iter() {
-            rates.insert(rate.id, rate);
-        }
-
-        Self { currencies, rates }
+        new_calculator.calculate_rates().await;
+        new_calculator
     }
 
-    fn get_rates(&self, start: CurrencyId) -> Vec<CalculatedRate> {
-        let mut current_path: Vec<ConversionEdge> = Vec::new();
-        let mut result = Vec::new();
+    async fn calculate_rates(&mut self) {
+        self.rates.clear();
+        self.nodes.clear();
+
         let mut visited: HashSet<CurrencyId> = HashSet::new();
-        let mut queue: VecDeque<(CurrencyId, Vec<ConversionEdge>)> = VecDeque::new();
-        visited.insert(start);
-        queue.push_back((start, vec![]));
 
-        while let Some((curr_id, mut current_path)) = queue.pop_front() {
-            //lookup
-            let direct_rates = self.rates.values().filter(|rate| rate.from == curr_id);
+        let rootNode = ConversionNode {
+            currency_id: self.main_currency_id,
+            rate_id: None,
+            inverted: false,
+        };
+        self.nodes.insert(rootNode.currency_id, rootNode);
 
-            for rate in direct_rates {
-                if visited.contains(&rate.to) {
-                    continue;
-                }
+        let mut queue: VecDeque<ConversionNode> = VecDeque::new();
+        visited.insert(rootNode.currency_id);
+        queue.push_back(rootNode);
 
-                let mut next_path = current_path.clone();
-                next_path.push(ConversionEdge {
-                    rate_id: rate.id,
+        while let Some(node) = queue.pop_front() {
+            let rates = ExchangeRateQuery::get_from(&self.db, node.currency_id)
+                .await
+                .expect("Could not lookup rate");
+
+            let inverted_rates = ExchangeRateQuery::get_to(&self.db, node.currency_id)
+                .await
+                .expect("Could not lookup rate");
+
+            let mut new_nodes = Vec::<ConversionNode>::new();
+
+            for rate in rates {
+                let new_node = ConversionNode {
+                    currency_id: rate.to_id,
+                    rate_id: Some(rate.id),
                     inverted: false,
-                });
-
-                queue.push_back((rate.to, next_path.clone()));
-                visited.insert(rate.to);
-
-                let rate_number = next_path.iter().fold(1f64, |acc, next| {
-                    let next_rate = self.rates.get(&next.rate_id).unwrap();
-                    match next.inverted {
-                        false => acc * next_rate.rate,
-                        true => acc * 1f64 / next_rate.rate,
-                    }
-                });
-                let calculated_rate = CalculatedRate {
-                    rate: rate_number,
-                    to: rate.to,
-                    path: next_path.clone(),
                 };
-                result.push(calculated_rate);
+                self.rates.insert(rate.id, rate);
+                new_nodes.push(new_node);
+            }
+            for rate in inverted_rates {
+                let new_node = ConversionNode {
+                    currency_id: rate.from_id,
+                    rate_id: Some(rate.id),
+                    inverted: true,
+                };
+                self.rates.insert(rate.id, rate);
+                new_nodes.push(new_node);
             }
 
-            //reverse lookup
-
-            let reversed_rates = self.rates.values().filter(|rate| rate.to == curr_id);
-
-            for rate in reversed_rates {
-                if visited.contains(&rate.from) {
+            for new_node in new_nodes {
+                if visited.contains(&new_node.currency_id) {
                     continue;
                 }
 
-                let mut next_path = current_path.clone();
-                next_path.push(ConversionEdge {
-                    rate_id: rate.id,
-                    inverted: true,
-                });
-
-                queue.push_back((rate.from, next_path.clone()));
-                visited.insert(rate.from);
-                let rate_number = next_path.iter().fold(1f64, |acc, next| {
-                    let next_rate = self.rates.get(&next.rate_id).unwrap();
-                    match next.inverted {
-                        false => acc * next_rate.rate,
-                        true => acc * 1f64 / next_rate.rate,
-                    }
-                });
-                let calculated_rate = CalculatedRate {
-                    rate: rate_number,
-                    to: rate.from,
-                    path: next_path.clone(),
-                };
-                result.push(calculated_rate);
+                visited.insert(new_node.currency_id);
+                self.nodes.insert(new_node.currency_id, new_node);
+                queue.push_back(new_node);
             }
         }
-        result
+    }
+
+    pub fn get_rate(&self, currency_id: CurrencyId) -> Option<CalculatedRate> {
+        let mut new_calculated_rate = CalculatedRate {
+            path: Vec::new(),
+            rate: 1f64,
+            to: currency_id,
+        };
+        let mut conversionNode = self
+            .nodes
+            .get(&currency_id)
+            .expect("Cannot find the currency in rate calculator");
+        while conversionNode.currency_id != self.main_currency_id {
+            let rate = self.rates.get(&conversionNode.rate_id.unwrap()).unwrap();
+            let mut next_rate: f64;
+            let mut next_node_id: CurrencyId;
+
+            if conversionNode.inverted {
+                next_node_id = rate.from_id;
+                next_rate = new_calculated_rate.rate / rate.rate
+            } else {
+                next_node_id = rate.to_id;
+                next_rate = new_calculated_rate.rate * rate.rate
+            };
+
+            new_calculated_rate.rate = next_rate;
+            new_calculated_rate.path.push(*conversionNode);
+            conversionNode = self
+                .nodes
+                .get(&next_node_id)
+                .expect("Cannot get currency from rate calculator");
+        }
+        Some(new_calculated_rate)
     }
 }
-
-#[derive(Debug)]
-struct CalculatedRate {
-    to: CurrencyId,
-    rate: f64,
-    path: Vec<ConversionEdge>,
-}
-fn app_test() {
-    const USD_ID: CurrencyId = 0;
-    let calculator = RateCalculator::new();
-    let usd_rates = calculator.get_rates(USD_ID);
-    dbg!(usd_rates);
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn it_works() {
-        app_test();
-    }
-}
-
-/*
-
-A -> B (R01 1.5) -> D (R02 2.0)
-                 <- F (R03 3.0)
-  -> C -> D
-  -> F
-  -> E
-
-
-
-B: [[B, R01, false]]
-C: nothing
-D: [[A, 1.0], [B, 1.2,], [D, 2.0]]
-E: nothing
-
-Path: Vec<ConversionEdge>::new(); = []
-
-[[R01, false]]
-
-Start with A
-
-B
-
- */
