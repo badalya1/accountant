@@ -1,17 +1,17 @@
 use juniper::{graphql_object, FieldResult, ID};
 
-use crate::db::Database;
+use crate::context::Context;
 use crate::types::Currency;
 use crate::types::{ConvertableResult, IDi32};
 use accountant_core::currency;
 
 pub struct CurrencyMutation;
 
-#[graphql_object(context = Database)]
+#[graphql_object(context = Context)]
 impl CurrencyMutation {
     async fn setSelected(
         &self,
-        context: &Database,
+        context: &Context,
         currency_id: ID,
         value: bool,
     ) -> FieldResult<Currency> {

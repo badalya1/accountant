@@ -1,5 +1,5 @@
 use super::{currency::*, IDi32};
-use crate::db::Database;
+use crate::context::Context;
 use accountant_core::currency;
 use cuid::cuid2 as cuid;
 use entity::account;
@@ -53,7 +53,7 @@ impl Into<String> for AccountType {
     }
 }
 
-#[graphql_object(context = Database)]
+#[graphql_object(context = Context)]
 impl Account {
     fn id(&self) -> ID {
         ID::new(&(self.model.id)).clone()
@@ -65,7 +65,7 @@ impl Account {
         AccountType::from_str(&self.model.account_type).unwrap()
     }
 
-    async fn currency(&self, context: &Database) -> FieldResult<Currency> {
+    async fn currency(&self, context: &Context) -> FieldResult<Currency> {
         let conn = context.get_connection();
         let currency: Currency =
             currency::CurrencyQuery::find_currency_by_id(conn, self.model.currency_id)

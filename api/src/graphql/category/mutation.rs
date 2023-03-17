@@ -1,17 +1,17 @@
 use juniper::{graphql_object, FieldResult, ID};
 
-use crate::db::Database;
+use crate::context::Context;
 use crate::types::{Category, UpdateCategoryInput};
 use crate::types::{ConvertableResult, IDi32};
 use accountant_core::category;
 
 pub struct CategoryMutation;
 
-#[graphql_object(context = Database)]
+#[graphql_object(context = Context)]
 impl CategoryMutation {
     async fn update(
         &self,
-        context: &Database,
+        context: &Context,
         category_id: ID,
         value: UpdateCategoryInput,
     ) -> FieldResult<Category> {

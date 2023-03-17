@@ -1,14 +1,14 @@
 use juniper::{graphql_object, FieldResult};
 
-use crate::db::Database;
+use crate::context::Context;
 use crate::types::{Category, ConvertableVec};
 use accountant_core::category;
 
 pub struct CategoryQuery;
 
-#[graphql_object(context = Database)]
+#[graphql_object(context = Context)]
 impl CategoryQuery {
-    async fn list(context: &Database) -> FieldResult<Vec<Category>> {
+    async fn list(context: &Context) -> FieldResult<Vec<Category>> {
         let conn = context.get_connection();
         let categories = category::CategoryQuery::list_roots(conn)
             .await

@@ -1,4 +1,4 @@
-use crate::db::Database;
+use crate::context::Context;
 
 use juniper::graphql_object;
 
@@ -8,7 +8,7 @@ use super::currency::CurrencyMutation;
 
 pub struct Mutation;
 
-#[graphql_object(context = Database)]
+#[graphql_object(context = Context)]
 impl Mutation {
     fn accounts(&self) -> AccountMutation {
         AccountMutation

@@ -3,7 +3,7 @@ use entity::category::*;
 
 use juniper::{graphql_object, FieldResult, GraphQLInputObject, ID};
 
-use crate::{db::Database, types::ConvertableVec};
+use crate::{context::Context, types::ConvertableVec};
 
 #[derive(Debug, Clone)]
 pub struct Category {
@@ -23,7 +23,7 @@ impl From<Model> for Category {
     }
 }
 
-#[graphql_object(context = Database)]
+#[graphql_object(context = Context)]
 impl Category {
     fn id(&self) -> ID {
         ID::from(self.model.id.to_string())
@@ -31,7 +31,7 @@ impl Category {
     fn name(&self) -> &str {
         &self.model.name
     }
-    async fn children(&self, context: &Database) -> FieldResult<Vec<Category>> {
+    async fn children(&self, context: &Context) -> FieldResult<Vec<Category>> {
         let conn = context.get_connection();
 
         let categories = category::CategoryQuery::get_children(conn, self.model.id).await?;
