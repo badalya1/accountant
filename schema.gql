@@ -1,5 +1,5 @@
-type AccountMutation {
-  create(data: NewAccountInput!): Account!
+type CategoryMutation {
+  update(categoryId: ID!, value: UpdateCategoryInput!): Category!
 }
 
 type AccountQuery {
@@ -9,6 +9,13 @@ type AccountQuery {
 type Mutation {
   accounts: AccountMutation!
   currencies: CurrencyMutation!
+  categories: CategoryMutation!
+}
+
+type Category {
+  id: ID!
+  name: String!
+  children: [Category!]!
 }
 
 type Currency {
@@ -19,6 +26,7 @@ type Currency {
   numericCode: Int!
   digits: Int!
   selected: Boolean!
+  rate: CalculatedRate
 }
 
 type CurrencyMutation {
@@ -32,6 +40,27 @@ enum AccountType {
   PROMISE
 }
 
+type Query {
+  apiVersion: String!
+  accounts: AccountQuery!
+  currencies: CurrencyQuery!
+  categories: CategoryQuery!
+}
+
+type AccountMutation {
+  create(data: NewAccountInput!): Account!
+}
+
+type CategoryQuery {
+  list: [Category!]!
+}
+
+input UpdateCategoryInput {
+  name: String
+  icon: String
+  description: String
+}
+
 input NewAccountInput {
   name: String!
   currencyId: ID!
@@ -39,10 +68,8 @@ input NewAccountInput {
   icon: String
 }
 
-type Query {
-  apiVersion: String!
-  accounts: AccountQuery!
-  currencies: CurrencyQuery!
+type CalculatedRate {
+  rate: Float!
 }
 
 type Account {
