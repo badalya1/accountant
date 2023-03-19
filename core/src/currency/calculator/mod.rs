@@ -1,4 +1,3 @@
-use entity::currency::Model as Currency;
 use entity::exchange_rate::Model as Rate;
 use sea_orm::DbConn;
 use std::collections::{HashMap, HashSet, VecDeque};
@@ -108,26 +107,29 @@ impl RateCalculator {
             rate: 1f64,
             to: currency_id,
         };
-        let mut conversionNode = self
-            .nodes
-            .get(&currency_id)
-            .expect("Cannot find the currency in rate calculator");
-        while conversionNode.currency_id != self.main_currency_id {
-            let rate = self.rates.get(&conversionNode.rate_id.unwrap()).unwrap();
+        let mut conversion_node = match self.nodes.get(&currency_id) {
+            Some(node) => node,
+            None => {
+                // Return None if the currency node is not found
+                return None;
+            }
+        };
+        while conversion_node.currency_id != self.main_currency_id {
+            let rate = self.rates.get(&conversion_node.rate_id.unwrap()).unwrap();
             let mut next_rate: f64;
             let mut next_node_id: CurrencyId;
 
-            if conversionNode.inverted {
-                next_node_id = rate.from_id;
+            if conversion_node.inverted {
+                next_node_id = rate.to_id;
                 next_rate = new_calculated_rate.rate / rate.rate
             } else {
-                next_node_id = rate.to_id;
+                next_node_id = rate.from_id;
                 next_rate = new_calculated_rate.rate * rate.rate
             };
 
             new_calculated_rate.rate = next_rate;
-            new_calculated_rate.path.push(*conversionNode);
-            conversionNode = self
+            new_calculated_rate.path.push(*conversion_node);
+            conversion_node = self
                 .nodes
                 .get(&next_node_id)
                 .expect("Cannot get currency from rate calculator");
