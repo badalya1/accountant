@@ -1,7 +1,9 @@
 use entity::currency;
-use juniper::{graphql_object, ID};
+use juniper::{graphql_object, FieldResult, ID};
 
 use crate::context::Context;
+
+use super::CalculatedRate;
 
 #[derive(Debug, Clone)]
 pub struct Currency {
@@ -37,8 +39,12 @@ impl Currency {
     fn selected(&self) -> &bool {
         &self.model.selected
     }
-    fn rate($self, context: &Context) -> FieldResult<CalculatedRate> {
-        todo!()
-
+    async fn rate(&self, context: &Context) -> Option<CalculatedRate> {
+        let calculator = &context.forex;
+        let result = calculator.get_rate(self.model.id);
+        match result {
+            Some(rate) => Some(rate.into()),
+            None => None,
+        }
     }
 }
