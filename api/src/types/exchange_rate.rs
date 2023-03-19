@@ -1,10 +1,11 @@
 use accountant_core::currency;
 use entity::exchange_rate;
-use juniper::{graphql_object, FieldResult, ID};
+use juniper::{graphql_object, FieldError, FieldResult, ID};
+use migration::DbErr;
 
 use crate::context::Context;
 
-use super::{ConvertableVec, Currency};
+use super::Currency;
 
 #[derive(Debug, Clone)]
 pub struct CalculatedRate {
@@ -17,16 +18,6 @@ impl From<currency::CalculatedRate> for CalculatedRate {
     }
 }
 
-#[graphql_object(context = Context)]
-impl CalculatedRate {
-    fn rate(&self) -> &f64 {
-        &self.model.rate
-    }
-    fn path(&self) -> FieldResult<Vec<ConversionNode>> {
-        todo!()
-    }
-}
-
 #[derive(Debug, Clone)]
 pub struct ConversionNode {
     model: currency::ConversionNode,
@@ -35,19 +26,6 @@ pub struct ConversionNode {
 impl From<currency::ConversionNode> for ConversionNode {
     fn from(value: currency::ConversionNode) -> Self {
         ConversionNode { model: value }
-    }
-}
-
-#[graphql_object(context = Context)]
-impl ConversionNode {
-    fn currency(&self) -> &f64 {
-        &self.model.rate
-    }
-    fn rate(&self) -> FieldResult<ExchangeRate> {
-        &self.model.rate
-    }
-    fn inverted(&self) -> &bool {
-        &self.model.inverted
     }
 }
 
@@ -63,15 +41,51 @@ impl From<exchange_rate::Model> for ExchangeRate {
 }
 
 #[graphql_object(context = Context)]
+impl ConversionNode {
+    async fn currency(&self, context: &Context) -> FieldResult<Currency> {
+        let db = context.get_connection();
+        Ok(
+            currency::CurrencyQuery::find_currency_by_id(db, self.model.currency_id)
+                .await
+                .expect("This must exist")
+                .expect("Yes")
+                .into(),
+        )
+    }
+
+    fn inverted(&self) -> &bool {
+        &self.model.inverted
+    }
+}
+
+#[graphql_object(context = Context)]
+impl CalculatedRate {
+    fn rate(&self) -> &f64 {
+        &self.model.rate
+    }
+}
+
+#[graphql_object(context = Context)]
 impl ExchangeRate {
     fn id(&self) -> ID {
         ID::from(self.model.id.to_string())
     }
-    fn from(&self, context: &Context) -> FieldResult<Currency> {
-        &self.model.rate
+    async fn from(&self, context: &Context) -> FieldResult<Currency> {
+        let db = context.get_connection();
+        let currency = currency::CurrencyQuery::find_currency_by_id(&db, self.model.from_id)
+            .await
+            .expect("Could not query currency")
+            .expect("Could not query currency");
+        Ok(currency.into())
     }
-    fn to(&self, context: &Context) -> FieldResult<Currency> {
-        todo!()
+    async fn to(&self, context: &Context) -> FieldResult<Currency> {
+        let db = context.get_connection();
+        let currency = currency::CurrencyQuery::find_currency_by_id(&db, self.model.to_id)
+            .await
+            .expect("Could not query currency")
+            .expect("Could not query currency");
+
+        Ok(currency.into())
     }
     fn rate(&self) -> &f64 {
         &self.model.rate
