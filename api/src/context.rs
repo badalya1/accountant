@@ -15,13 +15,16 @@ impl Context {
         .await
         .expect("Could not connect to database");
 
-        let forex = RateCalculator::new(connection.clone(), 1).await;
+        let forex = RateCalculator::new(connection.clone()).await;
 
         Context { connection, forex }
     }
 
     pub fn get_connection(&self) -> &DatabaseConnection {
         &self.connection
+    }
+    pub fn get_rate_calculator(&self) -> &RateCalculator {
+        &self.forex
     }
 }
 

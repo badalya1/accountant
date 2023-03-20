@@ -17,14 +17,6 @@ impl MigrationTrait for Migration {
         let db = manager.get_connection();
         let transaction = db.begin().await?;
 
-        // //Specify relative path
-        // let currencies_json_path = Path::new("migration/src/data/currencies.json");
-
-        // // Open the file using `std::fs::File`.
-        // let file = File::open(currencies_json_path).unwrap();
-        // let reader = BufReader::new(file);
-
-        // Parse the JSON string into a `Value` using `serde_json::from_reader`.
         let currencies_json: Value = serde_json::from_str(get_currencies_str()).unwrap();
 
         // Extract the JSON array from the `Value`.

@@ -41,6 +41,7 @@ dependencies = [
  "juniper_warp",
  "log",
  "migration",
+ "serde",
  "serde_json",
  "strum",
  "strum_macros",

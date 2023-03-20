@@ -1,3 +1,4 @@
+use crate::settings::SettingsQuery;
 use ::entity::{currency, currency::Entity as Currency};
 use sea_orm::*;
 
@@ -14,8 +15,12 @@ impl CurrencyQuery {
         Currency::find_by_id(id).one(db).await
     }
 
-    // pub async fn get_main_currency(db: &DbConn) -> Result<currency::Model, DbErr> {
-    //     let main_currency_id = Preference::find_by_id()
-    //     Currency::find_by_id(id).one(db).await
-    // }
+    pub async fn get_main_currency_id(db: &DbConn) -> Result<i32, DbErr> {
+        let main_currency_id = SettingsQuery::get(db, "MAIN_CURRENCY").await?;
+        let main_currency_id = main_currency_id.value.parse::<i32>();
+        match main_currency_id {
+            Ok(id) => Ok(id),
+            Err(_) => Err(DbErr::RecordNotFound("MAIN_CURRENCY is empty".to_string())),
+        }
+    }
 }

@@ -8,7 +8,7 @@ use crate::{context::Context, types::Json};
 
 use strum_macros::EnumString;
 
-#[derive(GraphQLEnum, EnumString, Debug)]
+#[derive(GraphQLEnum, EnumString, PartialEq, Debug, Copy, Clone)]
 pub enum SettingKey {
     Theme,
     MainCurrency,

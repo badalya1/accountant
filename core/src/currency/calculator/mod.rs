@@ -4,6 +4,8 @@ use std::collections::{HashMap, HashSet, VecDeque};
 
 use crate::exchange_rate::ExchangeRateQuery;
 
+use super::CurrencyQuery;
+
 type CurrencyId = i32;
 type RateId = i32;
 
@@ -30,7 +32,11 @@ pub struct RateCalculator {
 }
 
 impl RateCalculator {
-    pub async fn new(db: DbConn, main_currency_id: CurrencyId) -> Self {
+    pub async fn new(db: DbConn) -> Self {
+        let main_currency_id = CurrencyQuery::get_main_currency_id(&db)
+            .await
+            .expect("Could not get main currency id");
+
         let mut new_calculator = Self {
             db,
             main_currency_id,
@@ -42,9 +48,14 @@ impl RateCalculator {
         new_calculator
     }
 
-    async fn calculate_rates(&mut self) {
+    pub async fn calculate_rates(&mut self) {
         self.rates.clear();
         self.nodes.clear();
+
+        let main_currency_id = CurrencyQuery::get_main_currency_id(&self.db)
+            .await
+            .expect("Could not get main currency id");
+        self.main_currency_id = main_currency_id;
 
         let mut visited: HashSet<CurrencyId> = HashSet::new();
 
