@@ -48,16 +48,16 @@ impl RateCalculator {
 
         let mut visited: HashSet<CurrencyId> = HashSet::new();
 
-        let rootNode = ConversionNode {
+        let root_node = ConversionNode {
             currency_id: self.main_currency_id,
             rate_id: None,
             inverted: false,
         };
-        self.nodes.insert(rootNode.currency_id, rootNode);
+        self.nodes.insert(root_node.currency_id, root_node);
 
         let mut queue: VecDeque<ConversionNode> = VecDeque::new();
-        visited.insert(rootNode.currency_id);
-        queue.push_back(rootNode);
+        visited.insert(root_node.currency_id);
+        queue.push_back(root_node);
 
         while let Some(node) = queue.pop_front() {
             let rates = ExchangeRateQuery::get_from(&self.db, node.currency_id)

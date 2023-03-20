@@ -1,3 +1,4 @@
+use super::ConvertableVec;
 use accountant_core::currency;
 use entity::exchange_rate;
 use juniper::{graphql_object, FieldError, FieldResult, ID};
@@ -62,6 +63,13 @@ impl ConversionNode {
 impl CalculatedRate {
     fn rate(&self) -> &f64 {
         &self.model.rate
+    }
+
+    fn path(&self) -> Vec<ConversionNode> {
+        let path = &self.model.path;
+        let new_path: Vec<ConversionNode> = path.clone().convert();
+
+        new_path.clone()
     }
 }
 
