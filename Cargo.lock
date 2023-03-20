@@ -25,6 +25,7 @@ dependencies = [
  "cuid",
  "entity",
  "sea-orm",
+ "serde_json",
 ]
 
 [[package]]
