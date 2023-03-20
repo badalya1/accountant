@@ -1,8 +1,7 @@
 use super::ConvertableVec;
 use accountant_core::currency;
 use entity::exchange_rate;
-use juniper::{graphql_object, FieldError, FieldResult, ID};
-use migration::DbErr;
+use juniper::{graphql_object, FieldResult, ID};
 
 use crate::context::Context;
 

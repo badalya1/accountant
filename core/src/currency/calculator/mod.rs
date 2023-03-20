@@ -116,8 +116,8 @@ impl RateCalculator {
         };
         while conversion_node.currency_id != self.main_currency_id {
             let rate = self.rates.get(&conversion_node.rate_id.unwrap()).unwrap();
-            let mut next_rate: f64;
-            let mut next_node_id: CurrencyId;
+            let next_rate: f64;
+            let next_node_id: CurrencyId;
 
             if conversion_node.inverted {
                 next_node_id = rate.to_id;

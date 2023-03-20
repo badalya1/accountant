@@ -1,5 +1,5 @@
 use entity::currency;
-use juniper::{graphql_object, FieldResult, ID};
+use juniper::{graphql_object, ID};
 
 use crate::context::Context;
 
