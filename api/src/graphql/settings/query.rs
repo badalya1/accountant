@@ -1,7 +1,7 @@
 use juniper::{graphql_object, FieldResult};
 
 use crate::context::Context;
-use crate::types::{ConvertableResult, ConvertableVec, Settings};
+use crate::types::{ConvertableVec, SettingKey, Settings};
 use accountant_core::settings;
 
 pub struct SettingsQuery;
@@ -15,9 +15,10 @@ impl SettingsQuery {
         Ok(result)
     }
 
-    async fn get(context: &Context, key: String) -> FieldResult<Settings> {
+    async fn get(context: &Context, key: SettingKey) -> FieldResult<Settings> {
         let conn = context.get_connection();
-        let settings = settings::SettingsQuery::get(conn, &key).await?;
+        let key_str = Into::<String>::into(key);
+        let settings = settings::SettingsQuery::get(conn, &key_str).await?;
         let result: Settings = settings.into();
         Ok(result)
     }
