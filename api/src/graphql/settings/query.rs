@@ -1,20 +1,24 @@
 use juniper::{graphql_object, FieldResult};
 
 use crate::context::Context;
-use crate::types::{ConvertableVec, Currency};
-use accountant_core::currency;
+use crate::types::{ConvertableResult, ConvertableVec, Settings};
+use accountant_core::settings;
 
-pub struct CurrencyQuery;
+pub struct SettingsQuery;
 
 #[graphql_object(context = Context)]
-impl CurrencyQuery {
-    async fn list(context: &Context) -> FieldResult<Vec<Currency>> {
+impl SettingsQuery {
+    async fn list(context: &Context) -> FieldResult<Vec<Settings>> {
         let conn = context.get_connection();
-        let currencies = currency::CurrencyQuery::get_all_currencies(conn)
-            .await
-            .map_err(|e| e.to_string())
-            .unwrap();
-        let result: Vec<Currency> = currencies.convert();
+        let settings = settings::SettingsQuery::get_all(conn).await?;
+        let result: Vec<Settings> = settings.convert();
+        Ok(result)
+    }
+
+    async fn get(context: &Context, key: String) -> FieldResult<Settings> {
+        let conn = context.get_connection();
+        let settings = settings::SettingsQuery::get(conn, &key).await?;
+        let result: Settings = settings.into();
         Ok(result)
     }
 }
