@@ -1,4 +1,7 @@
-use super::{account::AccountQuery, category::CategoryQuery, currency::CurrencyQuery};
+use super::{
+    account::AccountQuery, category::CategoryQuery, currency::CurrencyQuery,
+    settings::SettingsQuery,
+};
 use crate::context::Context;
 use juniper::graphql_object;
 
@@ -17,5 +20,8 @@ impl Query {
     }
     fn categories(&self) -> CategoryQuery {
         CategoryQuery
+    }
+    fn settings(&self) -> SettingsQuery {
+        SettingsQuery
     }
 }

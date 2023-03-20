@@ -8,7 +8,6 @@ impl SettingsMutation {
     pub async fn set(db: &DbConn, key: &str, value: Value) -> Result<preference::Model, DbErr> {
         //Set the value of already existing setting given by key.
         //If the setting does not exist, create it.
-        let mut setting: preference::ActiveModel;
         let setting_lookup = preference::Entity::find()
             .filter(preference::Column::Field.eq(key))
             .one(db)

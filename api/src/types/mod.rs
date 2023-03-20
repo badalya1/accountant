@@ -2,11 +2,15 @@ mod account;
 mod category;
 mod currency;
 mod exchange_rate;
+mod json;
+mod settings;
 
 pub use account::*;
 pub use category::*;
 pub use currency::*;
 pub use exchange_rate::*;
+pub use json::*;
+pub use settings::*;
 
 use juniper::{FieldResult, ID};
 use std::fmt::Display;

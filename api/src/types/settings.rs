@@ -1,8 +1,8 @@
-use accountant_core::settings;
+use entity::preference::*;
 
-use juniper::{graphql_object, FieldResult, GraphQLInputObject, ID};
+use juniper::{graphql_object, GraphQLInputObject, ID};
 
-use crate::{context::Context, types::ConvertableVec};
+use crate::{context::Context, types::Json};
 
 #[derive(Debug, Clone)]
 pub struct Settings {
@@ -27,7 +27,10 @@ impl Settings {
     fn id(&self) -> ID {
         ID::from(self.model.id.to_string())
     }
-    fn name(&self) -> &str {
-        &self.model.name
+    fn key(&self) -> &str {
+        &self.model.field
+    }
+    fn value(&self) -> Json {
+        Json(self.model.value.clone()).to_owned()
     }
 }

@@ -1,24 +1,19 @@
-use juniper::{graphql_object, FieldResult, ID};
+use juniper::{graphql_object, FieldResult};
 
 use crate::context::Context;
-use crate::types::Currency;
-use crate::types::{ConvertableResult, IDi32};
-use accountant_core::currency;
+use crate::types::ConvertableResult;
+use crate::types::Settings;
+use accountant_core::settings;
 
 pub struct SettingsMutation;
 
 #[graphql_object(context = Context)]
-impl CurrencyMutation {
-    async fn setSelected(
-        &self,
-        context: &Context,
-        currency_id: ID,
-        value: bool,
-    ) -> FieldResult<Currency> {
+impl SettingsMutation {
+    //set
+    async fn set(&self, context: &Context, key: String, value: String) -> FieldResult<Settings> {
         let conn = context.get_connection();
-        let id: IDi32 = currency_id.into();
-        let new_account =
-            currency::CurrencyMutation::set_currency_selected(conn, id.0.into(), value).await;
-        new_account.convert()
+        let new_settings =
+            settings::SettingsMutation::set(conn, &key.to_owned(), value.into()).await;
+        new_settings.convert()
     }
 }
