@@ -16,8 +16,8 @@ impl CurrencyQuery {
     }
 
     pub async fn get_main_currency_id(db: &DbConn) -> Result<i32, DbErr> {
-        let main_currency_id = SettingsQuery::get(db, "MAIN_CURRENCY").await?;
-        let main_currency_id = main_currency_id.value.parse::<i32>();
+        let main_currency_id_setting = SettingsQuery::get(db, "MAIN_CURRENCY").await?;
+        let main_currency_id = main_currency_id_setting.value.parse::<i32>();
         match main_currency_id {
             Ok(id) => Ok(id),
             Err(_) => Err(DbErr::RecordNotFound("MAIN_CURRENCY is empty".to_string())),
