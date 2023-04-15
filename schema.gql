@@ -79,6 +79,51 @@ type Account {
   currency: Currency!
 }
 
+interface Transaction {
+  id: ID!
+  date: Date!
+  amount: Float!
+  description: String!
+  category: Category!
+}
+
+type DebitTransaction implements Transaction {
+  id: ID!
+  date: Date!
+  amount: Float!
+  toAccount: Account!
+  description: String
+  category: Category
+}
+
+type CreditTransaction implements Transaction {
+  id: ID!
+  date: Date!
+  amount: Float!
+  fromAccount: Account!
+  description: String
+  category: Category
+}
+
+type Transfer implements Transaction {
+  id: ID!
+  date: Date!
+  amount: Float!
+  description: String
+  fromAccount: Account!
+  toAccount: Account!
+  category: Category
+}
+
+type Transfer {
+  id: ID!
+  date: Date!
+  amount: Float!
+  description: String!
+  fromAccount: Account!
+  toAccount: Account!
+}
+
 type CurrencyQuery {
   list: [Currency!]!
 }
@@ -87,4 +132,3 @@ schema {
   query: Query
   mutation: Mutation
 }
-
