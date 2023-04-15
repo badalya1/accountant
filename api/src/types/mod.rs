@@ -4,6 +4,7 @@ mod currency;
 mod exchange_rate;
 mod json;
 mod settings;
+mod transaction;
 
 pub use account::*;
 pub use category::*;
