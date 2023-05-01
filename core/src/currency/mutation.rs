@@ -21,11 +21,8 @@ impl CurrencyMutation {
     ) -> Result<currency::Model, DbErr> {
         let currency = Currency::find_by_id(currency_id).one(db).await;
 
-        let mut currency: currency::ActiveModel = currency
-            .unwrap()
-            .ok_or("Could not find currency")
-            .unwrap()
-            .into();
+        let mut currency: currency::ActiveModel =
+            currency?.ok_or("Could not find currency").unwrap().into();
         currency.selected = Set(value);
         currency.update(db).await
     }
