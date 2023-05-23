@@ -6,6 +6,7 @@ use super::account::AccountMutation;
 use super::category::CategoryMutation;
 use super::currency::CurrencyMutation;
 use super::settings::SettingsMutation;
+use super::transaction::TransactionMutation;
 
 pub struct Mutation;
 
@@ -22,5 +23,8 @@ impl Mutation {
     }
     fn settings(&self) -> SettingsMutation {
         SettingsMutation
+    }
+    fn transactions(&self) -> TransactionMutation {
+        TransactionMutation
     }
 }
