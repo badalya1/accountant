@@ -12,6 +12,7 @@ pub use currency::*;
 pub use exchange_rate::*;
 pub use json::*;
 pub use settings::*;
+pub use transaction::*;
 
 use juniper::{FieldResult, ID};
 use std::fmt::Display;
