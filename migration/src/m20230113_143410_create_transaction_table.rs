@@ -17,8 +17,15 @@ impl MigrationTrait for Migration {
                             .not_null()
                             .primary_key(),
                     )
+                    .col(ColumnDef::new(Transaction::Name).string().not_null())
                     .col(ColumnDef::new(Transaction::AccountId).string().not_null())
                     .col(ColumnDef::new(Transaction::Amount).double().not_null())
+                    .col(
+                        ColumnDef::new(Transaction::Date)
+                            .date_time()
+                            .not_null()
+                            .extra("DEFAULT CURRENT_TIMESTAMP".to_owned()),
+                    )
                     .col(
                         ColumnDef::new(Transaction::CreatedAt)
                             .date_time()
@@ -28,7 +35,8 @@ impl MigrationTrait for Migration {
                     .col(
                         ColumnDef::new(Transaction::UpdatedAt)
                             .date_time()
-                            .not_null(),
+                            .not_null()
+                            .extra("DEFAULT CURRENT_TIMESTAMP".to_owned()),
                     )
                     .col(ColumnDef::new(Transaction::Notes).text())
                     .foreign_key(
@@ -55,8 +63,10 @@ impl MigrationTrait for Migration {
 pub enum Transaction {
     Table,
     Id,
+    Name,
     AccountId,
     Amount,
+    Date,
     CreatedAt,
     UpdatedAt,
     Notes,
