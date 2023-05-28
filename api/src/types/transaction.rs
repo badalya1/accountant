@@ -19,11 +19,12 @@ pub struct CreditTransaction {
 
 #[derive(GraphQLInputObject)]
 pub struct NewTransactionInput {
+    pub name: String,
     pub date: String,
     pub amount: f64,
-    pub description: String,
+    pub description: Option<String>,
     pub account_id: ID,
-    pub category_id: ID,
+    pub category_id: Option<ID>,
 }
 #[derive(GraphQLInputObject)]
 pub struct TimespanInput {
@@ -47,9 +48,10 @@ impl From<NewTransactionInput> for transaction::Model {
     fn from(value: NewTransactionInput) -> Self {
         transaction::Model {
             id: cuid(),
+            name: value.name,
             account_id: value.account_id.to_string(),
             amount: value.amount,
-            notes: Some(value.description),
+            notes: value.description,
             date: DateTime::parse_from_rfc3339(&value.date)
                 .unwrap()
                 .with_timezone(&Utc)
@@ -64,6 +66,9 @@ impl From<NewTransactionInput> for transaction::Model {
 impl DebitTransaction {
     fn id(&self) -> ID {
         ID::from(self.model.id.to_string())
+    }
+    fn name(&self) -> &String {
+        &self.model.name
     }
     fn date(&self) -> &String {
         &self.model.created_at
@@ -88,6 +93,9 @@ impl DebitTransaction {
 impl CreditTransaction {
     fn id(&self) -> ID {
         ID::from(self.model.id.to_string())
+    }
+    fn name(&self) -> &String {
+        &self.model.name
     }
     fn date(&self) -> &String {
         &self.model.created_at
