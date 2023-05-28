@@ -1,6 +1,6 @@
 use super::{currency::*, IDi32};
 use crate::context::Context;
-use accountant_core::currency;
+use accountant_core::{account::AccountQuery, currency};
 use cuid::cuid2 as cuid;
 use entity::account;
 use juniper::{graphql_object, FieldResult, GraphQLEnum, GraphQLInputObject, ID};
@@ -75,6 +75,15 @@ impl Account {
                 .expect("Could not find the currency associated with this account")
                 .into();
         Ok(currency)
+    }
+
+    async fn balance(&self, context: &Context) -> FieldResult<f64> {
+        let conn = context.get_connection();
+        let balance = AccountQuery::get_account_balance(conn, self.model.id.clone())
+            .await
+            .map_err(|e| e.to_string())
+            .unwrap();
+        Ok(balance)
     }
 }
 
