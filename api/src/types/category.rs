@@ -31,6 +31,9 @@ impl Category {
     fn name(&self) -> &str {
         &self.model.name
     }
+    fn icon(&self) -> &Option<String> {
+        &self.model.icon
+    }
     async fn children(&self, context: &Context) -> FieldResult<Vec<Category>> {
         let conn = context.get_connection();
 
