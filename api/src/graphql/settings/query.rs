@@ -17,7 +17,7 @@ impl SettingsQuery {
 
     async fn get(context: &Context, key: SettingKey) -> FieldResult<Settings> {
         let conn = context.get_connection();
-        let key_str = Into::<String>::into(key);
+        let key_str: String = key.into();
         let settings = settings::SettingsQuery::get(conn, &key_str).await?;
         let result: Settings = settings.into();
         Ok(result)
