@@ -77,13 +77,21 @@ impl Account {
         Ok(currency)
     }
 
-    async fn balance(&self, context: &Context) -> FieldResult<f64> {
+    async fn closing_balance(&self, context: &Context) -> FieldResult<f64> {
         let conn = context.get_connection();
         let balance = AccountQuery::get_account_balance(conn, self.model.id.clone())
             .await
             .map_err(|e| e.to_string())
             .unwrap();
-        Ok(balance)
+        Ok(balance.closing)
+    }
+    async fn opening_balance(&self, context: &Context) -> FieldResult<f64> {
+        let conn = context.get_connection();
+        let balance = AccountQuery::get_account_balance(conn, self.model.id.clone())
+            .await
+            .map_err(|e| e.to_string())
+            .unwrap();
+        Ok(balance.opening)
     }
 }
 

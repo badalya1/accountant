@@ -9,6 +9,7 @@ impl SettingsQuery {
         Ok(settings)
     }
     pub async fn get(db: &DbConn, key: &str) -> Result<settings::Model, DbErr> {
+        println!("Getting settings for {}", key);
         let settings = Settings::find()
             .filter(settings::Column::Field.eq(key))
             .one(db)

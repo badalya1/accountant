@@ -1,0 +1,20 @@
+[
+    {
+        "id": 1,
+        "field": "MainCurrency",
+        "value": "1",
+        "default_value": null
+    },
+    {
+        "id": 2,
+        "field": "FromDate",
+        "value": "0",
+        "default_value": null
+    },
+    {
+        "id": 3,
+        "field": "ToDate",
+        "value": "9999999999999999",
+        "default_value": null
+    }
+]

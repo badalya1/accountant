@@ -11,6 +11,7 @@ mod m20230216_143556_populate_currencies;
 mod m20230302_005050_user_preferences;
 mod m20230309_180039_transaction_categories;
 mod m20230309_180051_populate_categories;
+mod m20231031_003705_populate_user_preferences;
 
 pub struct Migrator;
 
@@ -27,6 +28,7 @@ impl MigratorTrait for Migrator {
             Box::new(m20230302_005050_user_preferences::Migration),
             Box::new(m20230309_180039_transaction_categories::Migration),
             Box::new(m20230309_180051_populate_categories::Migration),
+            Box::new(m20231031_003705_populate_user_preferences::Migration),
         ]
     }
 }

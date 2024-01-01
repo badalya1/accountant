@@ -54,8 +54,7 @@ impl From<NewTransactionInput> for transaction::Model {
             notes: value.description,
             date: DateTime::parse_from_rfc3339(&value.date)
                 .unwrap()
-                .with_timezone(&Utc)
-                .to_string(),
+                .to_rfc3339(),
             created_at: Utc::now().to_string(),
             updated_at: Utc::now().to_string(),
         }
